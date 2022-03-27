@@ -22,10 +22,14 @@
         <div class="step">
             <h1>总步数：{{ initInfo.step }}</h1>
         </div>
+        <div class="step">
+            <h1 v-if="bestResult != 0">历史最佳{{ bestResult }}步</h1>
+        </div>
     </div>
 </template>
 
-<script setup>import { reactive, ref, } from 'vue';
+<script setup>import { computed } from '@vue/reactivity';
+import { reactive, } from 'vue';
 const row = 10
 const column = 10
 const tableInit = reactive(Array.from(Array(row), _ => Array(column).fill(null)))
@@ -33,8 +37,21 @@ const initInfo = reactive({
     startFlag: 0,
     active: 0,
     step: 0,
-    count: 10
+    count: 10,
+    result: []
 })
+
+const bestResult = computed(() => {
+    let max = 0
+    for (let i = 0; i < initInfo.result.length; i++) {
+        if (initInfo.result[i] > max) {
+            max = initInfo.result[i]
+        }
+    }
+    return max
+})
+
+
 
 const barInit = function (row, column) {
     const barList = []
@@ -135,8 +152,6 @@ const getPath = function (data, row, column) {
         initInfo.active = 0
         return []
     }
-
-
 }
 
 
@@ -158,6 +173,7 @@ const start = function () {
             } else {
                 clearInterval(start)
                 initInfo.active = 0
+                initInfo.result.push(initInfo.step)
             }
         }, 100)
     }
@@ -185,6 +201,7 @@ const restart = function () {
     initInfo.startFlag = 0
     initInfo.step = 0
     initInfo.count = 10
+    initInfo.result.length = 0
     for (let i = 0; i < tableInit.length; i++) {
         for (let j = 0; j < tableInit[0].length; j++) {
             tableInit[i][j] = null
@@ -226,5 +243,13 @@ table {
     width: 30px;
     height: 30px;
     border: 1px solid black;
+}
+.stepList {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    div {
+        margin: 10px;
+    }
 }
 </style>
