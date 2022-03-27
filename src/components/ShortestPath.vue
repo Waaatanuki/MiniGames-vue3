@@ -146,7 +146,7 @@ const getPath = function (data, row, column) {
         }
         return []
     } else {
-        alert('封死了,玩个几把')
+        alert('封死了')
         again()
         initInfo.active = 0
         return []
