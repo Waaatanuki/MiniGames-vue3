@@ -23,7 +23,7 @@
             <h1>总步数：{{ initInfo.step }}</h1>
         </div>
         <div class="step">
-            <h1 v-if="bestResult != 0">历史最佳{{ bestResult }}步</h1>
+            <h1 v-if="bestResult != 0">历史最佳:{{ bestResult }}步</h1>
         </div>
     </div>
 </template>
@@ -86,7 +86,6 @@ const putBar = function (row, column) {
         if (tableInit[row - 1][column - 1] == null && initInfo.count > 0) {
             tableInit[row - 1][column - 1] = '❌'
             initInfo.count--
-
         } else if (tableInit[row - 1][column - 1] == '❌' && initInfo.count >= 0) {
             tableInit[row - 1][column - 1] = null
             initInfo.count++
