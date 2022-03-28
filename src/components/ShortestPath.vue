@@ -4,6 +4,9 @@
             <button @click="start" :disabled="initInfo.startFlag">开始</button>
             <button @click="again" :disabled="initInfo.active">重来</button>
             <button @click="restart" :disabled="initInfo.active">换地图</button>
+            <br />
+            种子:
+            <input v-model="map_seed" :disabled="false" allow-clear type="number"/>
         </div>
         <div>
             <h1>剩余放置障碍次数：{{ initInfo.count }}</h1>
@@ -28,7 +31,8 @@
     </div>
 </template>
 
-<script setup>import { computed } from '@vue/reactivity';
+<script setup>
+import { computed } from '@vue/reactivity';
 import { reactive, } from 'vue';
 const row = 10
 const column = 10
@@ -40,6 +44,16 @@ const initInfo = reactive({
     count: 10,
     result: []
 })
+var map_seed = "";
+
+
+function LCG(s) {
+    return function() {
+      s = Math.imul(48271, s) | 0 % 2147483647;
+      return (s & 2147483647) / 2147483648;
+    }
+}
+
 
 const bestResult = computed(() => {
     let max = 0
@@ -52,13 +66,12 @@ const bestResult = computed(() => {
 })
 
 
-
-const barInit = function (row, column) {
+const barInit = function (row, column, seed) {
     const barList = []
+    const rand = LCG(seed);
     const generateRandom = function (row, column) {
-
-        const x = Math.floor((Math.random() * row));
-        const y = Math.floor((Math.random() * column));
+        const x = Math.floor((rand() * row));
+        const y = Math.floor((rand() * column));
         if (!(x == 0 && y == 0 || (x == row - 1 && y == column - 1))) {
             for (let i = 0; i < barList.length; i++) {
                 if (barList[i].toString() == [x, y].toString()) {
@@ -208,7 +221,12 @@ const restart = function () {
     }
     tableInit[0][0] = '🐎'
 
-    const barList = barInit(row, column)
+    var seed = parseInt(map_seed);
+    if (!seed) {
+       seed = Math.floor(Math.random() * 1000000);
+       map_seed = seed.toString();
+    }
+    const barList = barInit(row, column, seed)
 
     for (let i = 0; i < barList.length; i++) {
         const e = barList[i];
