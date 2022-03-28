@@ -12,7 +12,7 @@
             <button @click="freeMap" :disabled="initInfo.active">自由模式</button>
         </div>
         <div>
-            <h1>剩余放置障碍次数：{{ initInfo.count }}</h1>
+            <h1>剩余放置障碍次数：{{ initInfo.count }}/{{ initInfo.maxCount }}</h1>
         </div>
         <div>
             <table>
@@ -44,6 +44,7 @@ const initInfo = reactive({
     active: 0,
     step: 0,
     count: 10,
+    maxCount: 10,
     result: [],
     map_seed: ''
 })
@@ -239,6 +240,7 @@ const randomMap = function () {
     initInfo.startFlag = 0
     initInfo.step = 0
     initInfo.count = 10
+    initInfo.maxCount = 10
     initInfo.result.length = 0
     initInfo.map_seed = ''
 
@@ -248,6 +250,11 @@ const randomMap = function () {
 
 const selectMap = function () {
     initInfo.map_seed = prompt('输入地图编号:')
+    initInfo.startFlag = 0
+    initInfo.step = 0
+    initInfo.count = 10
+    initInfo.maxCount = 10
+    initInfo.result.length = 0
     tableInit(ROW, COLUMN, BAR)
 }
 
@@ -255,6 +262,7 @@ const freeMap = function () {
     initInfo.startFlag = 0
     initInfo.step = 0
     const count = prompt('设置障碍数量:') || 98
+    initInfo.maxCount = count > 98 ? 98 : count
     initInfo.count = count > 98 ? 98 : count
     initInfo.result.length = 0
     initInfo.map_seed = '--------'
