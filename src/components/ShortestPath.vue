@@ -2,13 +2,13 @@
     <div class="main">
         <div>
             <h1>地图编号</h1>
-            <h2>{{ initInfo.mapNum }}</h2>
+            <h2>{{ initInfo.map_seed }}</h2>
         </div>
         <div class="selectArea">
             <button @click="start" :disabled="initInfo.startFlag">开始</button>
             <button @click="again" :disabled="initInfo.active">重来</button>
             <button @click="randomMap" :disabled="initInfo.active">随机地图</button>
-            <button>选择地图</button>
+            <button @click="selectMap">选择地图</button>
         </div>
         <div>
             <h1>剩余放置障碍次数：{{ initInfo.count }}</h1>
@@ -44,20 +44,33 @@ const initInfo = reactive({
     step: 0,
     count: 10,
     result: [],
-    mapNum: Math.floor((Math.random() * 100000))
+    mapNum: Math.floor((Math.random() * 100000)),
+    map_seed: ''
 })
+
+function LCG(s) {
+    return function () {
+        s = Math.imul(48271, s) | 0 % 2147483647;
+        return (s & 2147483647) / 2147483648;
+    }
+}
+
+
+
+
 const bestResult = computed(() =>
     initInfo.result.reduce((max, cur) => Math.max(max, cur), 0)
 )
 
-const randomBar = function (seed) {
-    return ('0.' + Math.sin(seed).toString().substring(6))
-}
-const barInit = function (row, column, num) {
+
+const barInit = function (row, column, num, seed) {
     const barList = []
+    const rand = LCG(seed);
     const generateRandom = function (row, column) {
-        const x = Math.floor((Math.random() * row));
-        const y = Math.floor((Math.random() * column));
+        // const x = Math.floor((Math.random() * row));
+        // const y = Math.floor((Math.random() * column));
+        const x = Math.floor((rand() * row));
+        const y = Math.floor((rand() * column));
         if (!(x == 0 && y == 0 || (x == row - 1 && y == column - 1))) {
             for (let i = 0; i < barList.length; i++) {
                 if (barList[i].toString() == [x, y].toString()) {
@@ -72,8 +85,6 @@ const barInit = function (row, column, num) {
         if (barList.length < num) {
             generateRandom(row, column);
         } else {
-
-
             break;
         }
     }
@@ -83,7 +94,16 @@ const barInit = function (row, column, num) {
 const tableInit = function (row, column, num) {
     initInfo.table = new Array(ROW).fill(null).map(_ => new Array(COLUMN).fill(null))
     initInfo.table[0][0] = '🐎'
-    const barList = barInit(row, column, num)
+
+    let seed = parseInt(initInfo.map_seed);
+    if (!seed) {
+        seed = Math.floor(Math.random() * 1000000);
+        initInfo.map_seed = seed.toString();
+    }
+
+    const barList = barInit(row, column, num, seed)
+
+
     for (let i = 0; i < barList.length; i++) {
         const e = barList[i];
         initInfo.table[e[0]][e[1]] = '⛰️'
@@ -200,10 +220,14 @@ const start = function () {
 const again = function () {
     initInfo.startFlag = 0
     initInfo.step = 0
-    initInfo.count = 10
+
     for (let i = 0; i < initInfo.table.length; i++) {
         for (let j = 0; j < initInfo.table[0].length; j++) {
-            if (initInfo.table[i][j] != '⛰️') {
+            if (initInfo.table[i][j] == '⛰️') {
+                initInfo.table[i][j] = '⛰️'
+            } else if (initInfo.table[i][j] == '❌') {
+                initInfo.table[i][j] = '❌'
+            } else {
                 initInfo.table[i][j] = null
             }
 
@@ -218,12 +242,16 @@ const randomMap = function () {
     initInfo.step = 0
     initInfo.count = 10
     initInfo.result.length = 0
-    initInfo.mapNum = Math.floor((Math.random() * 100000));
+    initInfo.map_seed = ''
     do {
         tableInit(ROW, COLUMN, BAR)
     } while (!next(ROW, COLUMN, initInfo.table));
 }
 
+const selectMap = function () {
+    initInfo.map_seed = prompt('输入地图编号:')
+    tableInit(ROW, COLUMN, BAR)
+}
 
 </script>
 
