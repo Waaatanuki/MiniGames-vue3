@@ -8,8 +8,8 @@
             <button @click="start" :disabled="initInfo.startFlag">开始</button>
             <button @click="again" :disabled="initInfo.active">重来</button>
             <button @click="randomMap" :disabled="initInfo.active">随机地图</button>
-            <button @click="selectMap">选择地图</button>
-            <button @click="freeMap">自由模式</button>
+            <button @click="selectMap" :disabled="initInfo.active">选择地图</button>
+            <button @click="freeMap" :disabled="initInfo.active">自由模式</button>
         </div>
         <div>
             <h1>剩余放置障碍次数：{{ initInfo.count }}</h1>
