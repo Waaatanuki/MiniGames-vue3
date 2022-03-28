@@ -3,10 +3,10 @@
         <div class="selectArea">
             <button @click="start" :disabled="initInfo.startFlag">开始</button>
             <button @click="again" :disabled="initInfo.active">重来</button>
-            <button @click="restart" :disabled="initInfo.active">换地图</button>
             <br />
             种子:
             <input v-model="map_seed" :disabled="false" allow-clear type="number"/>
+            <button @click="restart" :disabled="initInfo.active">换地图</button>
         </div>
         <div>
             <h1>剩余放置障碍次数：{{ initInfo.count }}</h1>
