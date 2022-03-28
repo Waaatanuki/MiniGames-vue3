@@ -4,6 +4,7 @@
             <button @click="start" :disabled="initInfo.startFlag">开始</button>
             <button @click="again" :disabled="initInfo.active">重来</button>
             <button @click="restart" :disabled="initInfo.active">换地图</button>
+            <button>选择地图</button>
         </div>
         <div>
             <h1>剩余放置障碍次数：{{ initInfo.count }}</h1>
