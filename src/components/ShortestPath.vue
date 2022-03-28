@@ -9,6 +9,7 @@
             <button @click="again" :disabled="initInfo.active">重来</button>
             <button @click="randomMap" :disabled="initInfo.active">随机地图</button>
             <button @click="selectMap">选择地图</button>
+            <button @click="freeMap">自由模式</button>
         </div>
         <div>
             <h1>剩余放置障碍次数：{{ initInfo.count }}</h1>
@@ -44,7 +45,6 @@ const initInfo = reactive({
     step: 0,
     count: 10,
     result: [],
-    mapNum: Math.floor((Math.random() * 100000)),
     map_seed: ''
 })
 
@@ -55,9 +55,6 @@ function LCG(s) {
     }
 }
 
-
-
-
 const bestResult = computed(() =>
     initInfo.result.reduce((max, cur) => Math.max(max, cur), 0)
 )
@@ -67,8 +64,6 @@ const barInit = function (row, column, num, seed) {
     const barList = []
     const rand = LCG(seed);
     const generateRandom = function (row, column) {
-        // const x = Math.floor((Math.random() * row));
-        // const y = Math.floor((Math.random() * column));
         const x = Math.floor((rand() * row));
         const y = Math.floor((rand() * column));
         if (!(x == 0 && y == 0 || (x == row - 1 && y == column - 1))) {
@@ -85,10 +80,22 @@ const barInit = function (row, column, num, seed) {
         if (barList.length < num) {
             generateRandom(row, column);
         } else {
-            break;
+            for (let i = 0; i < barList.length; i++) {
+                const e = barList[i];
+                initInfo.table[e[0]][e[1]] = '⛰️'
+            }
+            if (!next(ROW, COLUMN, initInfo.table)) {
+                barList.length = 0
+                initInfo.table = new Array(ROW).fill(null).map(_ => new Array(COLUMN).fill(null))
+                initInfo.table[0][0] = '🐎'
+            } else {
+                break;
+            }
+
         }
     }
-    return barList
+
+
 }
 
 const tableInit = function (row, column, num) {
@@ -101,13 +108,8 @@ const tableInit = function (row, column, num) {
         initInfo.map_seed = seed.toString();
     }
 
-    const barList = barInit(row, column, num, seed)
+    barInit(row, column, num, seed)
 
-
-    for (let i = 0; i < barList.length; i++) {
-        const e = barList[i];
-        initInfo.table[e[0]][e[1]] = '⛰️'
-    }
 }
 
 const next = function (row, column, table) {
@@ -147,16 +149,12 @@ const next = function (row, column, table) {
     }
 }
 
-
-do {
-    tableInit(ROW, COLUMN, BAR)
-
-} while (!next(ROW, COLUMN, initInfo.table));
-
+tableInit(ROW, COLUMN, BAR)
 
 
 const putBar = function (row, column, table) {
-    if (initInfo.active == 0 && table[9][9] != '🐎') {
+
+    if (initInfo.active == 0 && table[9][9] != '🐎' && !(row == 10 && column == 10)) {
         if (table[row - 1][column - 1] == null && initInfo.count > 0) {
             table[row - 1][column - 1] = '❌'
             initInfo.count--
@@ -243,14 +241,28 @@ const randomMap = function () {
     initInfo.count = 10
     initInfo.result.length = 0
     initInfo.map_seed = ''
-    do {
-        tableInit(ROW, COLUMN, BAR)
-    } while (!next(ROW, COLUMN, initInfo.table));
+
+    tableInit(ROW, COLUMN, BAR)
+
 }
 
 const selectMap = function () {
     initInfo.map_seed = prompt('输入地图编号:')
     tableInit(ROW, COLUMN, BAR)
+}
+
+const freeMap = function () {
+    initInfo.startFlag = 0
+    initInfo.step = 0
+    const count = prompt('设置障碍数量:') || 98
+    initInfo.count = count > 98 ? 98 : count
+    initInfo.result.length = 0
+    initInfo.map_seed = '--------'
+
+
+    initInfo.table = new Array(ROW).fill(null).map(_ => new Array(COLUMN).fill(null))
+    initInfo.table[0][0] = '🐎'
+
 }
 
 </script>
