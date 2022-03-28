@@ -1,9 +1,13 @@
 <template>
     <div class="main">
+        <div>
+            <h1>地图编号</h1>
+            <h2>{{ initInfo.mapNum }}</h2>
+        </div>
         <div class="selectArea">
             <button @click="start" :disabled="initInfo.startFlag">开始</button>
             <button @click="again" :disabled="initInfo.active">重来</button>
-            <button @click="restart" :disabled="initInfo.active">换地图</button>
+            <button @click="randomMap" :disabled="initInfo.active">随机地图</button>
             <button>选择地图</button>
         </div>
         <div>
@@ -11,53 +15,47 @@
         </div>
         <div>
             <table>
-                <tr v-for="r in tableInit.length">
+                <tr v-for="r in initInfo.table.length">
                     <td
                         class="area"
-                        v-for="c in tableInit[0].length"
-                        @click="putBar(r, c)"
-                    >{{ tableInit[r - 1][c - 1] }}</td>
+                        v-for="c in initInfo.table[0].length"
+                        @click="putBar(r, c, initInfo.table)"
+                    >{{ initInfo.table[r - 1][c - 1] }}</td>
                 </tr>
             </table>
         </div>
-        <div class="step">
+        <div>
             <h1>总步数：{{ initInfo.step }}</h1>
         </div>
-        <div class="step">
-            <h1 v-if="bestResult != 0">历史最佳:{{ bestResult }}步</h1>
+        <div class="bestStep">
+            <h1 v-show="bestResult != 0">历史最佳:{{ bestResult }}步</h1>
         </div>
     </div>
 </template>
 
-<script setup>import { computed } from '@vue/reactivity';
-import { reactive, } from 'vue';
-const row = 10
-const column = 10
-const tableInit = reactive(Array.from(Array(row), _ => Array(column).fill(null)))
+<script setup>
+import { reactive, computed } from 'vue';
+const ROW = 10
+const COLUMN = 10
+const BAR = 20
 const initInfo = reactive({
     startFlag: 0,
     active: 0,
     step: 0,
     count: 10,
-    result: []
+    result: [],
+    mapNum: Math.floor((Math.random() * 100000))
 })
+const bestResult = computed(() =>
+    initInfo.result.reduce((max, cur) => Math.max(max, cur), 0)
+)
 
-const bestResult = computed(() => {
-    let max = 0
-    for (let i = 0; i < initInfo.result.length; i++) {
-        if (initInfo.result[i] > max) {
-            max = initInfo.result[i]
-        }
-    }
-    return max
-})
-
-
-
-const barInit = function (row, column) {
+const randomBar = function (seed) {
+    return ('0.' + Math.sin(seed).toString().substring(6))
+}
+const barInit = function (row, column, num) {
     const barList = []
     const generateRandom = function (row, column) {
-
         const x = Math.floor((Math.random() * row));
         const y = Math.floor((Math.random() * column));
         if (!(x == 0 && y == 0 || (x == row - 1 && y == column - 1))) {
@@ -67,37 +65,33 @@ const barInit = function (row, column) {
                 }
             }
             barList.push([x, y])
-
         }
     }
 
     while (1) {
-        if (barList.length < 20) {
+        if (barList.length < num) {
             generateRandom(row, column);
         } else {
+
+
             break;
         }
     }
     return barList
 }
 
-
-const putBar = function (row, column) {
-    if (initInfo.active == 0 && tableInit[9][9] != '🐎') {
-        if (tableInit[row - 1][column - 1] == null && initInfo.count > 0) {
-            tableInit[row - 1][column - 1] = '❌'
-            initInfo.count--
-        } else if (tableInit[row - 1][column - 1] == '❌' && initInfo.count >= 0) {
-            tableInit[row - 1][column - 1] = null
-            initInfo.count++
-        }
+const tableInit = function (row, column, num) {
+    initInfo.table = new Array(ROW).fill(null).map(_ => new Array(COLUMN).fill(null))
+    initInfo.table[0][0] = '🐎'
+    const barList = barInit(row, column, num)
+    for (let i = 0; i < barList.length; i++) {
+        const e = barList[i];
+        initInfo.table[e[0]][e[1]] = '⛰️'
     }
-
 }
 
-
-const next = function (row, column, tableInit) {
-    const copyArr = tableInit.concat()
+const next = function (row, column, table) {
+    const copyArr = table.map(arr => arr.slice());
     const p = [[0, 0]]
     const directions = [[-1, 0], [1, 0], [0, 1], [0, -1]]
 
@@ -133,6 +127,28 @@ const next = function (row, column, tableInit) {
     }
 }
 
+
+do {
+    tableInit(ROW, COLUMN, BAR)
+
+} while (!next(ROW, COLUMN, initInfo.table));
+
+
+
+const putBar = function (row, column, table) {
+    if (initInfo.active == 0 && table[9][9] != '🐎') {
+        if (table[row - 1][column - 1] == null && initInfo.count > 0) {
+            table[row - 1][column - 1] = '❌'
+            initInfo.count--
+        } else if (table[row - 1][column - 1] == '❌' && initInfo.count >= 0) {
+            table[row - 1][column - 1] = null
+            initInfo.count++
+        }
+    }
+}
+
+
+
 const getPath = function (data, row, column) {
     const res = [[row - 1, column - 1]]
     let at = [row - 1, column - 1];
@@ -147,9 +163,6 @@ const getPath = function (data, row, column) {
         }
         return []
     } else {
-        alert('封死了')
-        again()
-        initInfo.active = 0
         return []
     }
 }
@@ -159,7 +172,7 @@ const start = function () {
     initInfo.startFlag = 1
     initInfo.active = 1
 
-    const shortestPath = getPath(next(row, column, tableInit), row, column)
+    const shortestPath = getPath(next(ROW, COLUMN, initInfo.table), ROW, COLUMN)
     if (shortestPath.length > 0) {
         const start = setInterval(() => {
             if (shortestPath.length > 0) {
@@ -167,8 +180,8 @@ const start = function () {
                 const pre = shortestPath.shift()
                 if (shortestPath.length != 0) {
                     initInfo.step++
-                    tableInit[pre[0]][pre[1]] = ''
-                    tableInit[shortestPath[0][0]][shortestPath[0][1]] = '🐎'
+                    initInfo.table[pre[0]][pre[1]] = ''
+                    initInfo.table[shortestPath[0][0]][shortestPath[0][1]] = '🐎'
                 }
             } else {
                 clearInterval(start)
@@ -176,6 +189,10 @@ const start = function () {
                 initInfo.result.push(initInfo.step)
             }
         }, 100)
+    } else {
+        alert('不可以把路封死!')
+        initInfo.startFlag = 0
+        initInfo.active = 0
     }
 }
 
@@ -184,40 +201,29 @@ const again = function () {
     initInfo.startFlag = 0
     initInfo.step = 0
     initInfo.count = 10
-    for (let i = 0; i < tableInit.length; i++) {
-        for (let j = 0; j < tableInit[0].length; j++) {
-            if (tableInit[i][j] != '⛰️') {
-                tableInit[i][j] = null
+    for (let i = 0; i < initInfo.table.length; i++) {
+        for (let j = 0; j < initInfo.table[0].length; j++) {
+            if (initInfo.table[i][j] != '⛰️') {
+                initInfo.table[i][j] = null
             }
 
         }
-
     }
-    tableInit[0][0] = '🐎'
+    initInfo.table[0][0] = '🐎'
 }
 
 
-const restart = function () {
+const randomMap = function () {
     initInfo.startFlag = 0
     initInfo.step = 0
     initInfo.count = 10
     initInfo.result.length = 0
-    for (let i = 0; i < tableInit.length; i++) {
-        for (let j = 0; j < tableInit[0].length; j++) {
-            tableInit[i][j] = null
-        }
-    }
-    tableInit[0][0] = '🐎'
-
-    const barList = barInit(row, column)
-
-    for (let i = 0; i < barList.length; i++) {
-        const e = barList[i];
-        tableInit[e[0]][e[1]] = '⛰️'
-    }
+    initInfo.mapNum = Math.floor((Math.random() * 100000));
+    do {
+        tableInit(ROW, COLUMN, BAR)
+    } while (!next(ROW, COLUMN, initInfo.table));
 }
 
-restart()
 
 </script>
 
@@ -251,5 +257,8 @@ table {
     div {
         margin: 10px;
     }
+}
+.bestStep {
+    height: 0px;
 }
 </style>
