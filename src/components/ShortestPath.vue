@@ -12,6 +12,9 @@
             <button @click="freeMap" :disabled="initInfo.active">自由模式</button>
         </div>
         <div>
+            <button @click="answer">test</button>
+        </div>
+        <div>
             <h1>剩余放置障碍次数：{{ initInfo.count }}/{{ initInfo.maxCount }}</h1>
         </div>
         <div>
@@ -99,6 +102,48 @@ const barInit = function (row, column, num, seed) {
 
 }
 
+const barBest = function (row, column, num) {
+    const barList = []
+    const generateRandom = function (row, column) {
+        const x = Math.floor((Math.random() * row));
+        const y = Math.floor((Math.random() * column));
+        if (!(x == 0 && y == 0 || (x == row - 1 && y == column - 1))) {
+            if (initInfo.table[x][y] != '⛰️') {
+                for (let i = 0; i < barList.length; i++) {
+                    if (barList[i].toString() == [x, y].toString()) {
+                        return false;
+                    }
+                }
+                barList.push([x, y])
+            }
+
+        }
+    }
+
+    while (1) {
+        if (barList.length < num) {
+            generateRandom(row, column);
+        } else {
+            for (let i = 0; i < barList.length; i++) {
+                const e = barList[i];
+                initInfo.table[e[0]][e[1]] = '⛰️'
+            }
+            if (!next(ROW, COLUMN, initInfo.table)) {
+                for (let i = 0; i < barList.length; i++) {
+                    const e = barList[i];
+                    initInfo.table[e[0]][e[1]] = null
+                }
+                barList.length = 0
+            } else {
+                break;
+            }
+
+        }
+    }
+
+
+}
+
 const tableInit = function (row, column, num) {
     initInfo.table = new Array(ROW).fill(null).map(_ => new Array(COLUMN).fill(null))
     initInfo.table[0][0] = '🐎'
@@ -112,6 +157,58 @@ const tableInit = function (row, column, num) {
     barInit(row, column, num, seed)
 
 }
+
+const answer = function () {
+    let max = 0
+    let result
+    for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < initInfo.table.length; i++) {
+            for (let j = 0; j < initInfo.table[0].length; j++) {
+                if (initInfo.table[i][j] == '❌') {
+                    initInfo.table[i][j] = null
+                }
+            }
+        }
+        const tempTable = initInfo.table.map(arr => arr.slice());
+        putRandomBar(ROW, COLUMN, tempTable, 10)
+        let shortestPath
+        for (let i = 0; i < 100; i++) {
+            shortestPath = getPath(next(ROW, COLUMN, tempTable), ROW, COLUMN)
+            let num = 0
+            for (let i = 0; i < tempTable.length; i++) {
+                for (let j = 0; j < tempTable[0].length; j++) {
+                    if (tempTable[i][j] == '❌') {
+                        tempTable[i][j] = null
+                        const pathLength = getPath(next(ROW, COLUMN, tempTable), ROW, COLUMN)
+                        if (shortestPath.length == pathLength.length) {
+                            num++
+                        } else {
+                            tempTable[i][j] = '❌'
+                        }
+                    }
+                }
+
+            }
+            putRandomBar(ROW, COLUMN, tempTable, num)
+        }
+
+        if (max < shortestPath.length - 1) {
+            max = shortestPath.length - 1
+            result = tempTable
+        }
+    }
+
+    console.log('300次循环后最优答案:', max);
+    for (let i = 0; i < result.length; i++) {
+        for (let j = 0; j < result[0].length; j++) {
+            if (result[i][j] == '❌') {
+                initInfo.table[i][j] = '❌'
+            }
+        }
+
+    }
+}
+
 
 const next = function (row, column, table) {
     const copyArr = table.map(arr => arr.slice());
@@ -166,6 +263,45 @@ const putBar = function (row, column, table) {
     }
 }
 
+const putRandomBar = function (row, column, table, num) {
+    const barList = []
+    const generateRandom = function (row, column) {
+        const x = Math.floor((Math.random() * row));
+        const y = Math.floor((Math.random() * column));
+        if (!(x == 0 && y == 0 || (x == row - 1 && y == column - 1))) {
+            if (table[x][y] != '⛰️' && table[x][y] != '❌') {
+                for (let i = 0; i < barList.length; i++) {
+                    if (barList[i].toString() == [x, y].toString()) {
+                        return false;
+                    }
+                }
+                barList.push([x, y])
+            }
+
+        }
+    }
+
+    while (1) {
+        if (barList.length < num) {
+            generateRandom(row, column);
+        } else {
+            for (let i = 0; i < barList.length; i++) {
+                const e = barList[i];
+                table[e[0]][e[1]] = '❌'
+            }
+            if (!next(ROW, COLUMN, table)) {
+                for (let i = 0; i < barList.length; i++) {
+                    const e = barList[i];
+                    table[e[0]][e[1]] = null
+                }
+                barList.length = 0
+            } else {
+                break;
+            }
+
+        }
+    }
+}
 
 
 const getPath = function (data, row, column) {
@@ -273,6 +409,41 @@ const freeMap = function () {
 
 }
 
+const demo = function () {
+    let max = 0
+    let result
+    for (let i = 0; i < 20; i++) {
+        randomMap()
+        let shortestPath = getPath(next(ROW, COLUMN, initInfo.table), ROW, COLUMN)
+        for (let i = 0; i < 200; i++) {
+            shortestPath = getPath(next(ROW, COLUMN, initInfo.table), ROW, COLUMN)
+            let num = 0
+            for (let i = 0; i < initInfo.table.length; i++) {
+                for (let j = 0; j < initInfo.table[0].length; j++) {
+                    if (initInfo.table[i][j] == '⛰️') {
+                        initInfo.table[i][j] = null
+                        const pathLength = getPath(next(ROW, COLUMN, initInfo.table), ROW, COLUMN)
+                        if (shortestPath.length == pathLength.length) {
+                            num++
+                        } else {
+                            initInfo.table[i][j] = '⛰️'
+                        }
+                    }
+                }
+
+            }
+            barBest(ROW, COLUMN, num)
+        }
+        console.log('300次循环后最优答案:', shortestPath.length - 1);
+        if (max < shortestPath.length - 1) {
+            max = shortestPath.length - 1
+            result = initInfo.table
+        }
+    }
+
+    initInfo.table = result
+    console.log(result);
+}
 </script>
 
 <style lang="less" scoped>
