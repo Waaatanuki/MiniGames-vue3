@@ -1,9 +1,9 @@
 <script setup>
-import ShortestPath from './components/ShortestPath.vue'
+import Layout from './components/Layout.vue'
 </script>
 
 <template>
-  <ShortestPath />
+  <Layout />
 </template>
 
 <style>

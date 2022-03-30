@@ -1,8 +1,7 @@
 <template>
     <div class="main">
         <div>
-            <h1>地图编号</h1>
-            <h2>{{ initInfo.map_seed }}</h2>
+            <h2>地图编号 {{ initInfo.map_seed }}</h2>
         </div>
         <div class="selectArea">
             <button @click="start" :disabled="initInfo.startFlag">开始</button>
@@ -404,7 +403,7 @@ const freeMap = function () {
     initInfo.maxCount = count > 98 ? 98 : count
     initInfo.count = count > 98 ? 98 : count
     initInfo.result.length = 0
-    initInfo.map_seed = '--------'
+    initInfo.map_seed = ''
 
 
     initInfo.table = new Array(ROW).fill(null).map(_ => new Array(COLUMN).fill(null))
@@ -452,12 +451,12 @@ const demo = function () {
 
 <style lang="less" scoped>
 .main {
+    padding-top: 5rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100vh;
 }
 .selectArea {
     margin-bottom: 20px;
