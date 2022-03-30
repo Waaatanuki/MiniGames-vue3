@@ -12,10 +12,7 @@
             <button @click="freeMap" :disabled="initInfo.active">自由模式</button>
         </div>
         <div>
-            <button @click="answer">test</button>
-        </div>
-        <div>
-            <h1>剩余放置障碍次数：{{ initInfo.count }}/{{ initInfo.maxCount }}</h1>
+            <h2>剩余放置障碍次数：{{ initInfo.count }}/{{ initInfo.maxCount }}</h2>
         </div>
         <div>
             <table>
@@ -29,10 +26,7 @@
             </table>
         </div>
         <div>
-            <h1>总步数：{{ initInfo.step }}</h1>
-        </div>
-        <div class="bestStep">
-            <h1 v-show="bestResult != 0">历史最佳:{{ bestResult }}步</h1>
+            <h2>总步数：{{ initInfo.step }}{{ bestResult != 0 ? ' 历史最佳:' + bestResult + '步' : '' }}</h2>
         </div>
     </div>
 </template>
@@ -161,15 +155,16 @@ const tableInit = function (row, column, num) {
 const answer = function () {
     let max = 0
     let result
-    for (let i = 0; i < 50; i++) {
-        for (let i = 0; i < initInfo.table.length; i++) {
-            for (let j = 0; j < initInfo.table[0].length; j++) {
-                if (initInfo.table[i][j] == '❌') {
-                    initInfo.table[i][j] = null
+    for (let i = 0; i < 100; i++) {
+        const tempTable = initInfo.table.map(arr => arr.slice());
+        for (let i = 0; i < tempTable.length; i++) {
+            for (let j = 0; j < tempTable[0].length; j++) {
+                if (tempTable[i][j] == '❌') {
+                    tempTable[i][j] = null
                 }
             }
         }
-        const tempTable = initInfo.table.map(arr => arr.slice());
+
         putRandomBar(ROW, COLUMN, tempTable, 10)
         let shortestPath
         for (let i = 0; i < 100; i++) {
@@ -198,15 +193,16 @@ const answer = function () {
         }
     }
 
-    console.log('300次循环后最优答案:', max);
-    for (let i = 0; i < result.length; i++) {
-        for (let j = 0; j < result[0].length; j++) {
-            if (result[i][j] == '❌') {
-                initInfo.table[i][j] = '❌'
-            }
-        }
+    console.log('参考答案:', max);
+    console.table(result);
+    // for (let i = 0; i < result.length; i++) {
+    //     for (let j = 0; j < result[0].length; j++) {
+    //         if (result[i][j] == '❌') {
+    //             initInfo.table[i][j] = '❌'
+    //         }
+    //     }
 
-    }
+    // }
 }
 
 
@@ -373,25 +369,32 @@ const again = function () {
 
 
 const randomMap = function () {
+    initInfo.map_seed = ''
     initInfo.startFlag = 0
     initInfo.step = 0
     initInfo.count = 10
     initInfo.maxCount = 10
     initInfo.result.length = 0
-    initInfo.map_seed = ''
-
     tableInit(ROW, COLUMN, BAR)
 
 }
 
 const selectMap = function () {
-    initInfo.map_seed = prompt('输入地图编号:')
-    initInfo.startFlag = 0
-    initInfo.step = 0
-    initInfo.count = 10
-    initInfo.maxCount = 10
-    initInfo.result.length = 0
-    tableInit(ROW, COLUMN, BAR)
+    const no = prompt('输入地图编号:')
+
+    if (no == null) return
+
+    if (no == 'ans') {
+        answer()
+    } else {
+        initInfo.map_seed = no
+        initInfo.startFlag = 0
+        initInfo.step = 0
+        initInfo.count = 10
+        initInfo.maxCount = 10
+        initInfo.result.length = 0
+        tableInit(ROW, COLUMN, BAR)
+    }
 }
 
 const freeMap = function () {
@@ -409,6 +412,7 @@ const freeMap = function () {
 
 }
 
+// 30座山最优
 const demo = function () {
     let max = 0
     let result
@@ -434,7 +438,7 @@ const demo = function () {
             }
             barBest(ROW, COLUMN, num)
         }
-        console.log('300次循环后最优答案:', shortestPath.length - 1);
+        console.log('参考答案:', shortestPath.length - 1);
         if (max < shortestPath.length - 1) {
             max = shortestPath.length - 1
             result = initInfo.table
