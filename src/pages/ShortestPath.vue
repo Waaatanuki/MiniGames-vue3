@@ -451,7 +451,7 @@ const demo = function () {
 
 <style lang="less" scoped>
 .main {
-    padding-top: 5rem;
+    padding-top: 3rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -479,8 +479,5 @@ table {
     div {
         margin: 10px;
     }
-}
-.bestStep {
-    height: 0px;
 }
 </style>

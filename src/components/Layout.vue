@@ -6,10 +6,10 @@
             <span class="site-name">MiniGames</span>
         </div>
         <aside class="sidebar" :class="showSide ? 'sidebar-open' : ''">
-            <router-link class="sidebar-links" active-class="active" to="/">主页</router-link>
+            <router-link class="sidebar-links" active-class="active" to="/">首页</router-link>
             <router-link class="sidebar-links" active-class="active" to="/ShortestPath">马在跑</router-link>
         </aside>
-        <main class="page">
+        <main class="page" @click="showSide = false">
             <router-view v-slot="{ Component }">
                 <keep-alive>
                     <component :is="Component"></component>
@@ -22,7 +22,7 @@
 <script setup>
 import { ref } from 'vue';
 
-let showSide = ref(true)
+let showSide = ref(false)
 
 
 const changeShowSide = function () {
@@ -75,6 +75,7 @@ const changeShowSide = function () {
     overflow-y: auto;
     .active {
         background-color: orange;
+        border-radius: 10px;
     }
 }
 .page {
@@ -111,6 +112,10 @@ aside {
         height: 1.7rem;
         line-height: 1.7rem;
         text-decoration: none;
+    }
+    .sidebar-links:hover {
+        background-color: orange;
+        border-radius: 10px;
     }
 }
 .sidebar-open {
