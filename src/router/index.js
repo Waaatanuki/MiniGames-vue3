@@ -9,6 +9,10 @@ const routes = [
         path: "/ShortestPath",
         component: () => import("../pages/ShortestPath.vue"),
     },
+    {
+        path: "/RotateSteps",
+        component: () => import("../pages/RotateSteps.vue"),
+    },
 ];
 
 export default createRouter({

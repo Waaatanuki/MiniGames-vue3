@@ -8,6 +8,7 @@
         <aside class="sidebar" :class="showSide ? 'sidebar-open' : ''">
             <router-link class="sidebar-links" active-class="active" to="/">首页</router-link>
             <router-link class="sidebar-links" active-class="active" to="/ShortestPath">马在跑</router-link>
+            <router-link class="sidebar-links" active-class="active" to="/RotateSteps">盘在转</router-link>
         </aside>
         <main class="page" @click="showSide = false">
             <router-view v-slot="{ Component }">
