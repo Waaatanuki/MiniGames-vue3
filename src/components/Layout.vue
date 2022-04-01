@@ -91,7 +91,6 @@ const changeShowSide = function () {
         transform: translateX(-100%);
         transition: transform 0.5s ease;
     }
-
     .sidebar-button {
         display: block;
     }
