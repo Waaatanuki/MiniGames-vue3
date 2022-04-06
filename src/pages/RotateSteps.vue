@@ -35,7 +35,10 @@
             </div>
         </div>
         <div class="result">
-            <h2>总步数：{{ initInfo.step }} {{ initInfo.bestStep != 9999 ? '最佳步数：' + initInfo.bestStep : '' }}</h2>
+            <h2
+                :style="initInfo.bestStep == initInfo.ans ? 'color:green' : 'color:#2c3e50'"
+            >总步数：{{ initInfo.step }} {{ initInfo.bestStep != 9999 ? '最佳步数：' + initInfo.bestStep : '' }}</h2>
+            <p style="fontSize:0.8rem">*绿色表明已达成最优解</p>
         </div>
     </div>
 </template>
@@ -48,6 +51,41 @@ const initInfo = reactive({
     step: 0,
     result: []
 })
+
+const findRotateSteps = function (ring, key) {
+    const ringMap = {};
+
+    for (let i = 0; i < ring.length; i++) {
+        const v = ring[i];
+        if (ringMap[v]) {
+            ringMap[v].push(i);
+        } else {
+            ringMap[v] = [i];
+        }
+    }
+
+    const doneMap = new Array(ring.length).fill(-1).map(_ => new Array(key.length).fill(-1));
+    const loop = function (ringI, keyI) {
+        let res = Infinity;
+        if (keyI == key.length) {
+            return 0;
+        }
+        if (doneMap[ringI][keyI] != -1) {
+            return doneMap[ringI][keyI];
+        }
+        const target = key[keyI];
+        for (const targetI of ringMap[target]) {
+            const d1 = Math.abs(targetI - ringI);
+            const d2 = ring.length - d1;
+            const min = Math.min(d1, d2);
+            res = Math.min(res, min + loop(targetI, keyI + 1));
+        }
+        doneMap[ringI][keyI] = res;
+        return res;
+    };
+
+    return key.length + loop(0, 0);
+};
 
 const wheelInit = function () {
     initInfo.wheelNum = []
@@ -72,7 +110,8 @@ const pwdInit = function () {
         initInfo.pwd.push(initInfo.alphabet[no])
 
     }
-
+    initInfo.ans = findRotateSteps(initInfo.alphabet, initInfo.pwd)
+    console.log('最优解:' + initInfo.ans + '步');
     initInfo.pwdShow = []
     initInfo.pwd.forEach(function (item) {
         initInfo.pwdShow.push({ letter: item, isDone: 0 })
@@ -148,6 +187,8 @@ const newGame = function () {
     initInfo.step = 0
     initInfo.result = []
 }
+
+
 
 
 </script>
