@@ -9,7 +9,7 @@
             <router-link class="sidebar-links" active-class="active" to="/">首页</router-link>
             <router-link class="sidebar-links" active-class="active" to="/ShortestPath">跑马</router-link>
             <router-link class="sidebar-links" active-class="active" to="/RotateSteps">转盘</router-link>
-            <router-link class="sidebar-links" active-class="active" to="/MaxCoins">戳气球</router-link>
+            <router-link class="sidebar-links" active-class="active" to="/MaxCoins">戳方块</router-link>
         </aside>
         <main class="page" @click="showSide = false">
             <router-view v-slot="{ Component }">
