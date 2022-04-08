@@ -7,8 +7,9 @@
         </div>
         <aside class="sidebar" :class="showSide ? 'sidebar-open' : ''">
             <router-link class="sidebar-links" active-class="active" to="/">首页</router-link>
-            <router-link class="sidebar-links" active-class="active" to="/ShortestPath">马在跑</router-link>
-            <router-link class="sidebar-links" active-class="active" to="/RotateSteps">盘在转</router-link>
+            <router-link class="sidebar-links" active-class="active" to="/ShortestPath">跑马</router-link>
+            <router-link class="sidebar-links" active-class="active" to="/RotateSteps">转盘</router-link>
+            <router-link class="sidebar-links" active-class="active" to="/MaxCoins">戳气球</router-link>
         </aside>
         <main class="page" @click="showSide = false">
             <router-view v-slot="{ Component }">
@@ -81,6 +82,7 @@ const changeShowSide = function () {
 }
 .page {
     padding-left: 8rem;
+    padding-top: 3rem;
 }
 
 @media (max-width: 750px) {

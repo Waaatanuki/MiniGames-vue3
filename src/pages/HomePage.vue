@@ -22,7 +22,6 @@
     justify-content: space-between;
     align-items: center;
     height: calc(100vh - 3rem);
-    padding-top: 3rem;
 }
 .content {
     margin-top: 3rem;

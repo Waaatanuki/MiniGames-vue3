@@ -13,6 +13,10 @@ const routes = [
         path: "/RotateSteps",
         component: () => import("../pages/RotateSteps.vue"),
     },
+    {
+        path: "/MaxCoins",
+        component: () => import("../pages/MaxCoins.vue"),
+    },
 ];
 
 export default createRouter({

@@ -195,7 +195,6 @@ const newGame = function () {
 
 <style lang="less" scoped>
 .main {
-    padding-top: 3rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
