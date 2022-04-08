@@ -112,20 +112,22 @@ gameInit()
 .selectArea {
     height: 4rem;
     button {
-        width: 3rem;
-        height: 3rem;
-        margin: 0.3rem;
-        border-radius: 1rem;
-        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+        border-radius: 20px;
+        line-height: 50px;
+        font-size: 15px;
     }
 }
 .control {
     button {
-        width: 4rem;
-        height: 3rem;
-        margin: 0.3rem;
-        border-radius: 0.5rem;
-        font-size: 1rem;
+        width: 70px;
+        height: 70px;
+        margin: 5px;
+        border-radius: 10px;
+        line-height: 70px;
+        font-size: 15px;
     }
 }
 .result {
